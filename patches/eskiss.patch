@@ -1,0 +1,43 @@
+diff -burN eskiss/build_pkg.sh eskiss-PS3/build_pkg.sh
+--- eskiss/build_pkg.sh	1969-12-31 19:00:00.000000000 -0500
++++ eskiss-PS3/build_pkg.sh	2013-12-20 14:36:30.517776007 -0500
+@@ -0,0 +1,28 @@
++#!/bin/sh
++## build_pkg.sh -- Script to build the eskiss package for the PS3 (Spork Schivago)
++shopt -s expand_aliases
++
++ESKISS_APPID=ESKISS_00
++ESKISS_CONTENTID="UP0001-$appid-0000000000000000"
++ESKISS_DATADIR=/dev_hdd0/game/${ESKISS_APPID}/USRDIR
++ESKISS_LOGO=../data/edje/title.png
++ESKISS_NAME=eskiss
++ESKISS_TITLE=Eskiss
++PSL1GHT_FSELF=make_self
++
++sed -e 's/Test - PSL1GHT/${ESKISS_TITLE}/' -e 's/TEST00000/${ESKISS_APPID}/' ${PS3DEV}/bin/sfo.xml > ps3sfo.xml
++cp src/bin/${ESKISS_NAME} ${ESKISS_NAME}.elf
++sprxlinker ${ESKISS_NAME}.elf
++${PSL1GHT_FSELF} ${ESKISS_NAME}.elf ${ESKISS_NAME}.self
++mkdir -p pkg/USRDIR
++cp ${ESKISS_LOGO} pkg/ICON0.PNG
++make_self_npdrm ${ESKISS_NAME}.elf pkg/USRDIR/EBOOT.BIN ${ESKISS_CONTENTID}
++sfo.py --title "${ESKISS_TITLE}" --appid "${ESKISS_APPID}" -f ps3sfo.xml pkg/PARAM.SFO
++make DESTDIR=`pwd`/temp_install install
++cp -rf temp_install${ESKISS_DATADIR}* pkg/USRDIR/
++rm -rf temp_install
++pkg.py --contentid ${ESKISS_CONTENTID} pkg/ ${ESKISS_NAME}.pkg
++cp ${ESKISS_NAME}.pkg ${ESKISS_NAME}.retail.pkg
++package_finalize ${ESKISS_NAME}.retail.pkg
++rm -rf pkg
++
+diff -burN eskiss/src/bin/physic_object.c eskiss-PS3/src/bin/physic_object.c
+--- eskiss/src/bin/physic_object.c	2013-12-20 14:37:38.094890348 -0500
++++ eskiss-PS3/src/bin/physic_object.c	2013-12-20 14:10:33.418380983 -0500
+@@ -40,7 +40,6 @@
+ 
+         space = cpSpaceNew();
+         space->gravity = cpv(0, -1000);
+-        space->elasticIterations = 10;
+ }
+ 
+ /**

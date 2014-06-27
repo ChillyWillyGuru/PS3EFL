@@ -1,0 +1,55 @@
+diff -burN expedite-1.7.9/Makefile.in expedite-1.7.9-PS3/Makefile.in
+--- expedite-1.7.9/Makefile.in	2013-10-31 18:52:33.000000000 -0400
++++ expedite-1.7.9-PS3/Makefile.in	2013-12-19 15:42:20.599171845 -0500
+@@ -64,6 +64,14 @@
+ pkglibdir = $(libdir)/@PACKAGE@
+ pkglibexecdir = $(libexecdir)/@PACKAGE@
+ am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
++EXPEDITE=expedite-1.7.9
++EXPEDITE_APPID=EXPEDITE_
++EXPEDITE_CONTENTID="UP0001-$appid-0000000000000000"
++EXPEDITE_DATADIR=/dev_hdd0/game/${EXPEDITE_APPID}/USRDIR
++EXPEDITE_LOGO=../data/logo.png
++EXPEDITE_NAME=expedite
++EXPEDITE_TITLE=Expedite - Evas Benchmarking Suite
++PSL1GHT_FSELF=make_self
+ install_sh_DATA = $(install_sh) -c -m 644
+ install_sh_PROGRAM = $(install_sh) -c
+ install_sh_SCRIPT = $(install_sh) -c
+@@ -703,6 +711,24 @@
+ 	    install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
+ 	    "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'" install; \
+ 	fi
++
++pkg:
++	sed -e 's/Test - PSL1GHT/$(EXPEDITE_TITLE)/' -e 's/TEST00000/$(EXPEDITE_APPID)/' $(PS3DEV)/bin/sfo.xml > ps3sfo.xml
++	cp src/bin/$(EXPEDITE_NAME) $(EXPEDITE_NAME).elf
++	sprxlinker $(EXPEDITE_NAME).elf
++	$(PSL1GHT_FSELF) $(EXPEDITE_NAME).elf $(EXPEDITE_NAME).self
++	mkdir -p pkg/USRDIR
++	cp $(EXPEDITE_LOGO) pkg/ICON0.PNG
++	make_self_npdrm $(EXPEDITE_NAME).elf pkg/USRDIR/EBOOT.BIN $(EXPEDITE_CONTENTID)
++	sfo.py --title "$(EXPEDITE_TITLE)" --appid "$(EXPEDITE_APPID)" -f ps3sfo.xml pkg/PARAM.SFO
++	make DESTDIR=`pwd`/temp_install install
++	cp -rf temp_install$(EXPEDITE_DATADIR)* pkg/USRDIR/
++	rm -rf temp_install
++	pkg.py --contentid $(EXPEDITE_CONTENTID) pkg/ $(EXPEDITE_NAME).pkg
++	cp $(EXPEDITE_NAME).pkg $(EXPEDITE_NAME).retail.pkg
++	package_finalize $(EXPEDITE_NAME).retail.pkg
++	rm -rf pkg
++
+ mostlyclean-generic:
+ 
+ clean-generic:
+diff -burN expedite-1.7.9/src/bin/engine_psl1ght.h expedite-1.7.9-PS3/src/bin/engine_psl1ght.h
+--- expedite-1.7.9/src/bin/engine_psl1ght.h	1969-12-31 19:00:00.000000000 -0500
++++ expedite-1.7.9-PS3/src/bin/engine_psl1ght.h	2013-12-19 14:59:21.489249052 -0500
+@@ -0,0 +1,8 @@
++#ifndef ENGINE_SOFTWARE_PSL1GHT_H
++#define ENGINE_SOFTWARE_PSL1GHT_H
++
++Eina_Bool engine_psl1ght_args(const char *engine, int width, int height);
++void engine_psl1ght_loop(void);
++void engine_psl1ght_shutdown(void);
++
++#endif

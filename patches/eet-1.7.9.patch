@@ -1,0 +1,20 @@
+diff -burN eet-1.7.9/src/lib/eet_image.c eet-1.7.9-PS3/src/lib/eet_image.c
+--- eet-1.7.9/src/lib/eet_image.c	2013-07-29 10:22:39.000000000 -0400
++++ eet-1.7.9-PS3/src/lib/eet_image.c	2013-12-11 20:38:38.659622542 -0500
+@@ -23,6 +23,16 @@
+ # ifdef __OpenBSD__
+ #  include <sys/types.h>
+ # endif /* ifdef __OpenBSD__ */
++
++#ifndef HAVE_BOOLEAN
++# ifndef TRUE
++#  define TRUE 1
++#  define FALSE 0
++# endif
++typedef unsigned char boolean;
++#define HAVE_BOOLEAN
++#endif
++
+ # include <netinet/in.h>
+ #endif /* ifdef HAVE_NETINET_IN_H */
+ 

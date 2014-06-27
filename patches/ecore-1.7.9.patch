@@ -1,0 +1,75 @@
+diff -burN ecore-1.7.9/src/lib/ecore_psl1ght/moveutil.h ecore-1.7.9-PS3/src/lib/ecore_psl1ght/moveutil.h
+--- ecore-1.7.9/src/lib/ecore_psl1ght/moveutil.h	1969-12-31 19:00:00.000000000 -0500
++++ ecore-1.7.9-PS3/src/lib/ecore_psl1ght/moveutil.h	2013-12-19 16:06:45.928466811 -0500
+@@ -0,0 +1,43 @@
++/*
++ * Copyright (C) Antonio José Ramos Márquez (bigboss)
++ * Copyright (C) Youness Alaoui (KaKaRoTo)
++ */
++
++#ifndef __MOVEUTIL_H__
++#define __MOVEUTIL_H__
++
++#include <ppu-types.h>
++#include <spurs/spurs.h>
++#include <io/camera.h>
++#include <io/move.h>
++
++typedef struct
++{
++   Spurs         *spurs;
++   cameraInfoEx   camInfo;
++   cameraReadInfo camRead;
++   gemState       state;
++} moveContext;
++
++static inline float
++vec_array(vec_float4 vec, unsigned int idx)
++{
++   union {
++      vec_float4 vec;
++      float      array[4];
++   } v;
++
++   v.vec = vec;
++
++   if (idx > 3)
++     return -1;
++   return v.array[idx];
++}
++
++moveContext *initMove();
++void         endMove(moveContext *context);
++void         readGemState(moveContext *context);
++int          processMove(moveContext *context);
++void         moveGet3DPosition(moveContext *context, float *x, float *y, float *z);
++
++#endif /* __MOVEUTIL_H__ */
+diff -burN ecore-1.7.9/src/lib/ecore_psl1ght/spursutil.h ecore-1.7.9-PS3/src/lib/ecore_psl1ght/spursutil.h
+--- ecore-1.7.9/src/lib/ecore_psl1ght/spursutil.h	1969-12-31 19:00:00.000000000 -0500
++++ ecore-1.7.9-PS3/src/lib/ecore_psl1ght/spursutil.h	2013-12-19 16:09:19.839803539 -0500
+@@ -0,0 +1,24 @@
++/*
++ * Copyright (C) Antonio José Ramos Márquez (bigboss)
++ * Copyright (C) Youness Alaoui (KaKaRoTo)
++ */
++
++#ifndef __SPURSUTIL_H__
++#define __SPURSUTIL_H__
++
++#include <ppu-types.h>
++#include <spurs/spurs.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/* Initialize spurs with a given name prefix (*/
++Spurs *initSpurs(const char *prefix_name);
++void   endSpurs(Spurs *spurs);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* __SPURSUTIL_H__ */
