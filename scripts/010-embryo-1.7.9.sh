@@ -28,7 +28,7 @@ NOCONFIGURE=1 ./autogen.sh >& ../build-logs/autogen_${EMBRYO}.log  || \
 cd build-ppu
 
 ## Configure the build
-CFLAGS="-g -O3 -Wall -mcpu=cell -mminimal-toc" \
+CFLAGS="-g -O3 -Wall -mminimal-toc" \
 CPPFLAGS="-I${PSL1GHT}/ppu/include -I${PS3DEV}/portlibs/ppu/include" \
 CXXFLAGS="-I${PSL1GHT}/ppu/include -I${PS3DEV}/portlibs/ppu/include" \
 LDFLAGS="-L${PSL1GHT}/ppu/lib -L${PS3DEV}/portlibs/ppu/lib" \

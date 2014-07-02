@@ -29,7 +29,7 @@ NOCONFIGURE=1 ./autogen.sh >& ../build-logs/autogen_${EINA}.log  || \
 
 ## Configure the build
 CPPFLAGS="-I${PSL1GHT}/ppu/include -I${PS3DEV}/portlibs/ppu/include -I${PS3DEV}/portlibs/ppu/include/escape-0" \
-CFLAGS="-g -O3 -Wall -mcpu=cell -mminimal-toc"  \
+CFLAGS="-g -O3 -Wall -mminimal-toc"  \
 CXXFLAGS="-I${PSL1GHT}/ppu/include -I${PS3DEV}/portlibs/ppu/include" \
 LDFLAGS="-L${PSL1GHT}/ppu/lib -L${PS3DEV}/portlibs/ppu/lib" \
 PKG_CONFIG_PATH="${PS3DEV}/portlibs/ppu/lib/pkgconfig" \

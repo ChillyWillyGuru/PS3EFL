@@ -29,7 +29,7 @@ cd build-ppu
 
 ## Configure the build
 CPPFLAGS="-I${PSL1GHT}/ppu/include -I${PS3DEV}/portlibs/ppu/include -I${PS3DEV}/portlibs/ppu/include/escape-0" \
-CFLAGS="-g -O3 -Wall -mcpu=cell -mminimal-toc" \
+CFLAGS="-g -O3 -Wall -mminimal-toc" \
 CXXFLAGS="-I${PSL1GHT}/ppu/include -I${PS3DEV}/portlibs/ppu/include" \
 LDFLAGS="-L${PSL1GHT}/ppu/lib -L${PS3DEV}/portlibs/ppu/lib" \
 PKG_CONFIG_LIBDIR="${PS3DEV}/portlibs/ppu/lib/pkgconfig" \
@@ -40,7 +40,8 @@ PKG_CONFIG="pkg-config --static" \
 	--disable-ecore-evas-software-x11 --disable-ecore-evas-opengl-x11 \
 	--disable-ecore-evas-software-16-x11 --disable-ecore-ipc \
 	--enable-ecore-sdl --enable-ecore-psl1ght --enable-ecore-evas-psl1ght \
-	--enable-ecore-con --enable-cares --enable-option-checking
+	--enable-ecore-evas-gl-psl1ght --enable-ecore-con --enable-cares \
+	--enable-option-checking
 
 ## Make and install
 ${MAKE:-make} all && ${MAKE:-make} install
