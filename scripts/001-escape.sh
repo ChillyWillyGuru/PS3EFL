@@ -30,7 +30,7 @@ cd build-ppu
 	AR="powerpc64-ps3-elf-ar" \
 	CC="powerpc64-ps3-elf-gcc"\
 	RANLIB="powerpc64-ps3-elf-ranlib" \
-	CFLAGS="-g -O3 -Wall -mcpu=cell -mminimal-toc" \
+	CFLAGS="-g -O3 -Wall -mminimal-toc" \
 	CPPFLAGS="-I${PSL1GHT}/ppu/include -I${PS3DEV}/portlibs/ppu/include" \
 	CXXFLAGS="-I${PSL1GHT}/ppu/include -I${PS3DEV}/portlibs/ppu/include" \
 	LDFLAGS="-L${PSL1GHT}/ppu/lib -L${PS3DEV}/portlibs/ppu/lib" \
