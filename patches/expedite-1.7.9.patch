@@ -1,6 +1,58 @@
+diff -burN expedite-1.7.9/autogen.sh expedite-1.7.9-PS3/autogen.sh
+--- expedite-1.7.9/autogen.sh	1969-12-31 19:00:00.000000000 -0500
++++ expedite-1.7.9-PS3/autogen.sh	2014-07-02 02:23:57.113113814 -0400
+@@ -0,0 +1,16 @@
++#!/bin/sh
++
++rm -rf autom4te.cache
++rm -f aclocal.m4 ltmain.sh
++
++touch README
++
++echo "Running aclocal..." ; aclocal $ACLOCAL_FLAGS -I m4 || exit 1
++echo "Running autoheader..." ; autoheader || exit 1
++echo "Running autoconf..." ; autoconf || exit 1
++echo "Running libtoolize..." ; (libtoolize --copy --automake || glibtoolize --automake) || exit 1
++echo "Running automake..." ; automake --add-missing --copy --gnu || exit 1
++
++if [ -z "$NOCONFIGURE" ]; then
++	./configure "$@"
++fi
+diff -burN expedite-1.7.9/configure.ac expedite-1.7.9-PS3/configure.ac
+--- expedite-1.7.9/configure.ac	2013-09-10 13:09:49.000000000 -0400
++++ expedite-1.7.9-PS3/configure.ac	2014-07-02 02:23:57.113113814 -0400
+@@ -76,6 +76,10 @@
+ # PSL1GHT
+ EXPEDITE_CHECK_ENGINE([psl1ght], [PSL1GHT], "yes")
+ 
++# RSXGL PSL1GHT
++EXPEDITE_CHECK_ENGINE([gl-psl1ght], [GL_PSL1GHT], "yes", [gl_psl1ght_libs="-lGL -lEGL"])
++AC_SUBST(gl_psl1ght_libs)
++
+ # GL SDL
+ EXPEDITE_CHECK_ENGINE([opengl-sdl], [OpenGL SDL], "yes")
+ 
+@@ -177,6 +181,9 @@
+ # PSL1GHT
+ AM_CONDITIONAL(BUILD_PSL1GHT, test "x$have_psl1ght" = "xyes")
+ 
++# RSXGL PSL1GHT
++AM_CONDITIONAL(BUILD_GL_PSL1GHT, test "x$have_gl_psl1ght" = "xyes")
++
+ # DirectFB
+ 
+ if test "x$have_directfb" = "xyes"; then
+@@ -269,6 +276,7 @@
+ echo "    FB...........................: ${have_fb}"
+ echo "    DirectFB.....................: ${have_directfb}"
+ echo "    PSL1GHT......................: ${have_psl1ght}"
++echo "    RSXGL PSL1GHT................: ${have_gl_psl1ght}"
+ echo "    Software X11 16 bits.........: ${have_software_16_x11}"
+ echo "    Software WinCE 16 bits.......: ${have_software_16_wince}"
+ echo
 diff -burN expedite-1.7.9/Makefile.in expedite-1.7.9-PS3/Makefile.in
 --- expedite-1.7.9/Makefile.in	2013-10-31 18:52:33.000000000 -0400
-+++ expedite-1.7.9-PS3/Makefile.in	2013-12-19 15:42:20.599171845 -0500
++++ expedite-1.7.9-PS3/Makefile.in	2014-07-02 02:23:35.897113060 -0400
 @@ -64,6 +64,14 @@
  pkglibdir = $(libdir)/@PACKAGE@
  pkglibexecdir = $(libexecdir)/@PACKAGE@
@@ -41,9 +93,344 @@ diff -burN expedite-1.7.9/Makefile.in expedite-1.7.9-PS3/Makefile.in
  mostlyclean-generic:
  
  clean-generic:
+diff -burN expedite-1.7.9/make_pkg.sh expedite-1.7.9-PS3/make_pkg.sh
+--- expedite-1.7.9/make_pkg.sh	1969-12-31 19:00:00.000000000 -0500
++++ expedite-1.7.9-PS3/make_pkg.sh	2014-07-02 16:00:56.164856114 -0400
+@@ -0,0 +1,31 @@
++#!/bin/bash
++set -e
++
++# Must set this option, else script will not expand aliases.
++shopt -s expand_aliases
++
++EXPEDITE="expedite-1.7.9"
++EXPEDITE_APPID="EXPEDITE_"
++EXPEDITE_CONTENTID="UP0001-${EXPEDITE_APPID}-0000000000000000"
++EXPEDITE_DATADIR="/dev_hdd0/game/${EXPEDITE_APPID}/USRDIR"
++EXPEDITE_LOGO="../data/logo.png"
++EXPEDITE_NAME="expedite"
++EXPEDITE_TITLE="Expedite - Evas Benchmarking Suite"
++PSL1GHT_FSELF="make_self"
++
++sed -e 's/Test - PSL1GHT/${EXPEDITE_TITLE}/' -e 's/TEST00000/${EXPEDITE_APPID}/' ${PS3DEV}/bin/sfo.xml > ps3sfo.xml
++	cp src/bin/${EXPEDITE_NAME} ${EXPEDITE_NAME}.elf
++	sprxlinker ${EXPEDITE_NAME}.elf
++	${PSL1GHT_FSELF} ${EXPEDITE_NAME}.elf ${EXPEDITE_NAME}.self
++	mkdir -p pkg/USRDIR
++	cp ${EXPEDITE_LOGO} pkg/ICON0.PNG
++	make_self_npdrm ${EXPEDITE_NAME}.elf pkg/USRDIR/EBOOT.BIN ${EXPEDITE_CONTENTID}
++	sfo.py --title "${EXPEDITE_TITLE}" --appid "${EXPEDITE_APPID}" -f ps3sfo.xml pkg/PARAM.SFO
++	make install DESTDIR=`pwd`/temp_install
++	cp -rf temp_install${EXPEDITE_DATADIR}/* pkg/USRDIR/
++	rm -rf temp_install
++	pkg.py --contentid ${EXPEDITE_CONTENTID} pkg/ ${EXPEDITE_NAME}.pkg
++	cp ${EXPEDITE_NAME}.pkg ${EXPEDITE_NAME}.retail.pkg
++	package_finalize ${EXPEDITE_NAME}.retail.pkg
++	rm -rf pkg
++
+diff -burN expedite-1.7.9/src/bin/engine_gl_psl1ght.c expedite-1.7.9-PS3/src/bin/engine_gl_psl1ght.c
+--- expedite-1.7.9/src/bin/engine_gl_psl1ght.c	1969-12-31 19:00:00.000000000 -0500
++++ expedite-1.7.9-PS3/src/bin/engine_gl_psl1ght.c	2014-07-02 02:23:57.114113814 -0400
+@@ -0,0 +1,284 @@
++#include "main.h"
++
++#include <Evas_Engine_GL_PSL1GHT.h>
++#include <io/mouse.h>
++#include <io/kb.h>
++
++static int window_width = 0;
++static int window_height = 0;
++
++Eina_Bool
++engine_gl_psl1ght_args(const char *engine, int width, int height)
++{
++   Evas_Engine_Info_GL_PSL1GHT *einfo;
++
++   evas_output_method_set(evas, evas_render_method_lookup("gl_psl1ght"));
++   einfo = (Evas_Engine_Info_GL_PSL1GHT *)evas_engine_info_get(evas);
++   if (!einfo)
++     {
++        printf("Evas does not support the RSXGL PSL1GHT Engine\n");
++        return EINA_FALSE;
++     }
++
++   if (!evas_engine_info_set(evas, (Evas_Engine_Info *)einfo))
++     {
++        printf("Evas can not setup the informations of the RSXGL PSL1GHT Engine\n");
++        return EINA_FALSE;
++     }
++
++   window_width = width;
++   window_height = height;
++   ioMouseInit(1);
++   ioKbInit(1);
++   return EINA_TRUE;
++}
++
++void
++engine_gl_psl1ght_loop(void)
++{
++   mouseInfo mouseinfo;
++   static int mouse_connected = FALSE;
++   static u8 mouse_buttons = 0;
++   static int mouse_x = 0;
++   static int mouse_y = 0;
++   KbInfo kbInfo;
++   static int keyboard_connected = FALSE;
++   static KbLed keyboard_leds = {{0}};
++   static KbMkey keyboard_mods = {{0}};
++   static u16 keyboard_old_key = 0;
++   int i;
++
++   /* Check mouse events */
++   ioMouseGetInfo(&mouseinfo);
++
++   if (mouseinfo.status[0] == 1 && !mouse_connected) // Connected
++     {
++        mouse_connected = TRUE;
++        mouse_buttons = 0;
++
++        // Old events in the queue are discarded
++        ioMouseClearBuf(0);
++     }
++   else if (mouseinfo.status[0] != 1 && mouse_connected) // Disconnected
++     {
++        mouse_connected = FALSE;
++        mouse_buttons = 0;
++     }
++
++   if (mouse_connected)
++     {
++        mouseDataList datalist;
++
++        ioMouseGetDataList(0, &datalist);
++
++        for (i = 0; i < datalist.count; i++) {
++             u8 old_left = mouse_buttons & 1;
++             u8 new_left = datalist.list[i].buttons & 1;
++             u8 old_right = mouse_buttons & 2;
++             u8 new_right = datalist.list[i].buttons & 2;
++             u8 old_middle = mouse_buttons & 4;
++             u8 new_middle = datalist.list[i].buttons & 4;
++
++             mouse_x += datalist.list[i].x_axis;
++             mouse_y += datalist.list[i].y_axis;
++             if (mouse_x < 0) mouse_x = 0;
++             if (mouse_y < 0) mouse_y = 0;
++             if (mouse_x > window_width) mouse_x = window_width;
++             if (mouse_y > window_height) mouse_x = window_height;
++
++             evas_event_feed_mouse_move(evas, mouse_x, mouse_y, 0, NULL);
++
++             if (old_left != new_left)
++               {
++                  if (new_left)
++                    evas_event_feed_mouse_down(evas, 1, EVAS_BUTTON_NONE, 0, NULL);
++                  else
++                    evas_event_feed_mouse_up(evas, 1, EVAS_BUTTON_NONE, 0, NULL);
++               }
++             if (old_right != new_right)
++               {
++                  if (new_right)
++                    evas_event_feed_mouse_down(evas, 3, EVAS_BUTTON_NONE, 0, NULL);
++                  else
++                    evas_event_feed_mouse_up(evas, 3, EVAS_BUTTON_NONE, 0, NULL);
++               }
++             if (old_middle != new_middle)
++               {
++                  if (new_middle)
++                    evas_event_feed_mouse_down(evas, 2, EVAS_BUTTON_NONE, 0, NULL);
++                  else
++                    evas_event_feed_mouse_up(evas, 2, EVAS_BUTTON_NONE, 0, NULL);
++               }
++             mouse_buttons = datalist.list[i].buttons;
++          }
++     }
++
++   /* Check keyboard events */
++   ioKbGetInfo(&kbInfo);
++
++   if (kbInfo.status[0] == 1 && !keyboard_connected)
++     {
++        /* Connected */
++         keyboard_connected = true;
++
++         // Old events in the queue are discarded
++         ioKbClearBuf(0);
++         keyboard_leds._KbLedU.leds = 0;
++         keyboard_mods._KbMkeyU.mkeys = 0;
++         keyboard_old_key = 0;
++
++         // Set raw keyboard code types to get scan codes
++         ioKbSetCodeType(0, KB_CODETYPE_ASCII);
++         ioKbSetReadMode(0, KB_RMODE_INPUTCHAR);
++     }
++   else if (kbInfo.status[0] != 1 && keyboard_connected)
++     {
++        /* Disconnected keyboard */
++         keyboard_connected = FALSE;
++     }
++
++   if (keyboard_connected)
++     {
++        KbData Keys;
++
++        // Read data from the keyboard buffer
++        if (ioKbRead(0, &Keys) == 0 && Keys.nb_keycode > 0)
++          {
++             if (Keys.mkey._KbMkeyU._KbMkeyS.l_shift !=
++                 keyboard_mods._KbMkeyU._KbMkeyS.l_shift ||
++                 Keys.mkey._KbMkeyU._KbMkeyS.r_shift !=
++                 keyboard_mods._KbMkeyU._KbMkeyS.r_shift)
++               {
++                  if (Keys.mkey._KbMkeyU._KbMkeyS.r_shift ||
++                      Keys.mkey._KbMkeyU._KbMkeyS.l_shift)
++                    evas_key_modifier_on(evas, "Shift");
++                  else
++                    evas_key_modifier_off(evas, "Shift");
++               }
++             if (Keys.mkey._KbMkeyU._KbMkeyS.l_ctrl !=
++                 keyboard_mods._KbMkeyU._KbMkeyS.l_ctrl ||
++                 Keys.mkey._KbMkeyU._KbMkeyS.r_ctrl !=
++                 keyboard_mods._KbMkeyU._KbMkeyS.r_ctrl)
++               {
++                  if (Keys.mkey._KbMkeyU._KbMkeyS.r_ctrl ||
++                      Keys.mkey._KbMkeyU._KbMkeyS.l_ctrl)
++                    evas_key_modifier_on(evas, "Control");
++                  else
++                    evas_key_modifier_off(evas, "Control");
++               }
++             if (Keys.mkey._KbMkeyU._KbMkeyS.l_alt !=
++                 keyboard_mods._KbMkeyU._KbMkeyS.l_alt ||
++                 Keys.mkey._KbMkeyU._KbMkeyS.r_alt !=
++                 keyboard_mods._KbMkeyU._KbMkeyS.r_alt)
++               {
++                  if (Keys.mkey._KbMkeyU._KbMkeyS.r_alt ||
++                      Keys.mkey._KbMkeyU._KbMkeyS.l_alt)
++                    evas_key_modifier_on(evas, "Alt");
++                  else
++                    evas_key_modifier_off(evas, "Alt");
++               }
++             if (Keys.mkey._KbMkeyU._KbMkeyS.l_win !=
++                 keyboard_mods._KbMkeyU._KbMkeyS.l_win ||
++                 Keys.mkey._KbMkeyU._KbMkeyS.r_win !=
++                 keyboard_mods._KbMkeyU._KbMkeyS.r_win)
++               {
++                  if (Keys.mkey._KbMkeyU._KbMkeyS.r_win ||
++                      Keys.mkey._KbMkeyU._KbMkeyS.l_win)
++                    evas_key_modifier_on(evas, "Super");
++                  else
++                    evas_key_modifier_off(evas, "Super");
++               }
++             keyboard_mods = Keys.mkey;
++
++             if (Keys.led._KbLedU._KbLedS.num_lock !=
++                 keyboard_leds._KbLedU._KbLedS.num_lock)
++               {
++                  if (Keys.led._KbLedU._KbLedS.num_lock)
++                    evas_key_lock_on(evas, "Num_Lock");
++                  else
++                    evas_key_lock_on(evas, "Num_Lock");
++               }
++             if (Keys.led._KbLedU._KbLedS.caps_lock !=
++                 keyboard_leds._KbLedU._KbLedS.caps_lock)
++               {
++                  if (Keys.led._KbLedU._KbLedS.caps_lock)
++                    evas_key_lock_on(evas, "Caps_Lock");
++                  else
++                    evas_key_lock_on(evas, "Caps_Lock");
++               }
++             if (Keys.led._KbLedU._KbLedS.scroll_lock !=
++                 keyboard_leds._KbLedU._KbLedS.scroll_lock)
++               {
++                  if (Keys.led._KbLedU._KbLedS.scroll_lock)
++                    evas_key_lock_on(evas, "Scroll_Lock");
++                  else
++                    evas_key_lock_on(evas, "Scroll_Lock");
++               }
++             keyboard_leds = Keys.led;
++
++             for (i = 0; i < Keys.nb_keycode; i++) {
++                  if (Keys.keycode[i] != keyboard_old_key)
++                    {
++                       u16 key = Keys.keycode[i];
++                       char *key_str = NULL;
++
++                       if (key == 0)
++                         key = keyboard_old_key;
++                       key_str = (char *)&key;
++
++                       printf ("Key %d is %X\n", i, key);
++                       key &= ~KB_KEYPAD;
++                       if (key & KB_RAWDAT)
++                         {
++                            key &= 0xFF;
++                            if (key == KB_RAWKEY_ESCAPE)
++                              key_str = "Escape";
++                            else if (key == KB_RAWKEY_ENTER)
++                              key_str = "Return";
++                            else if (key == KB_RAWKEY_UP_ARROW)
++                              key_str = "Up";
++                            else if (key == KB_RAWKEY_DOWN_ARROW)
++                              key_str = "Down";
++                            else if (key == KB_RAWKEY_LEFT_ARROW)
++                              key_str = "Left";
++                            else if (key == KB_RAWKEY_RIGHT_ARROW)
++                              key_str = "Right";
++                            else
++                              key_str = NULL;
++                         }
++                       else {
++                            if (key == 0x0A)
++                              key_str = "Return";
++                            else {
++                                 key_str[0] = key_str[1];
++                                 key_str[1] = 0;
++                              }
++                         }
++                       if (key_str)
++                         {
++                            if (Keys.keycode[i] != 0)
++                              {
++                                 printf ("Key %s pressed\n", key_str);
++                                 evas_event_feed_key_up(evas, key_str, key_str, NULL, NULL, 0, NULL);
++                              }
++                            else {
++                                 evas_event_feed_key_down(evas, key_str, key_str, NULL, NULL, 0, NULL);
++                                 printf ("Key %s released\n", key_str);
++                              }
++                         }
++                       keyboard_old_key = Keys.keycode[0];
++                    }
++               }
++          }
++     }
++   return;
++}
++
++void
++engine_gl_psl1ght_shutdown(void)
++{
++   ioMouseEnd();
++   ioKbEnd();
++   return;
++}
++
+diff -burN expedite-1.7.9/src/bin/engine_gl_psl1ght.h expedite-1.7.9-PS3/src/bin/engine_gl_psl1ght.h
+--- expedite-1.7.9/src/bin/engine_gl_psl1ght.h	1969-12-31 19:00:00.000000000 -0500
++++ expedite-1.7.9-PS3/src/bin/engine_gl_psl1ght.h	2014-07-02 02:23:57.114113814 -0400
+@@ -0,0 +1,8 @@
++#ifndef ENGINE_SOFTWARE_GL_PSL1GHT_H
++#define ENGINE_SOFTWARE_GL_PSL1GHT_H
++
++Eina_Bool engine_gl_psl1ght_args(const char *engine, int width, int height);
++void engine_gl_psl1ght_loop(void);
++void engine_gl_psl1ght_shutdown(void);
++
++#endif
 diff -burN expedite-1.7.9/src/bin/engine_psl1ght.h expedite-1.7.9-PS3/src/bin/engine_psl1ght.h
 --- expedite-1.7.9/src/bin/engine_psl1ght.h	1969-12-31 19:00:00.000000000 -0500
-+++ expedite-1.7.9-PS3/src/bin/engine_psl1ght.h	2013-12-19 14:59:21.489249052 -0500
++++ expedite-1.7.9-PS3/src/bin/engine_psl1ght.h	2014-07-02 02:23:35.897113060 -0400
 @@ -0,0 +1,8 @@
 +#ifndef ENGINE_SOFTWARE_PSL1GHT_H
 +#define ENGINE_SOFTWARE_PSL1GHT_H
@@ -53,3 +440,27 @@ diff -burN expedite-1.7.9/src/bin/engine_psl1ght.h expedite-1.7.9-PS3/src/bin/en
 +void engine_psl1ght_shutdown(void);
 +
 +#endif
+diff -burN expedite-1.7.9/src/bin/Makefile.am expedite-1.7.9-PS3/src/bin/Makefile.am
+--- expedite-1.7.9/src/bin/Makefile.am	2013-08-01 10:39:01.000000000 -0400
++++ expedite-1.7.9-PS3/src/bin/Makefile.am	2014-07-02 02:24:07.469114182 -0400
+@@ -144,7 +144,7 @@
+ 
+ expedite_CFLAGS = @WIN32_CFLAGS@
+ expedite_CXXFLAGS = @EXPEDITE_CXXFLAGS@
+-expedite_LDADD = @SDL_LIBS@ @x_libs@ @gdi_libs@ @ddraw_libs@ @d3d_libs@ @wince_16_libs@ @DIRECTFB_LIBS@ @XCB_LIBS@ @EVAS_LIBS@ @EINA_LIBS@ @EVIL_LIBS@ @gl_cocoa_libs@ -lm
++expedite_LDADD = @SDL_LIBS@ @x_libs@ @gdi_libs@ @ddraw_libs@ @d3d_libs@ @wince_16_libs@ @DIRECTFB_LIBS@ @XCB_LIBS@ @EVAS_LIBS@ @EINA_LIBS@ @EVIL_LIBS@ @gl_psl1ght_libs@ @gl_cocoa_libs@ -lm
+ expedite_LDFLAGS = @lt_enable_auto_import@
+ 
+ if BUILD_SOFTWARE_XLIB
+@@ -202,6 +202,11 @@
+ engine_psl1ght.c
+ endif
+ 
++if BUILD_GL_PSL1GHT
++expedite_SOURCES += \
++engine_gl_psl1ght.c
++endif
++
+ if BUILD_FB
+ expedite_SOURCES += \
+ engine_fb.c engine_fb.h
