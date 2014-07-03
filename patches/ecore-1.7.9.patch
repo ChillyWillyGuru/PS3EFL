@@ -1,6 +1,6 @@
 diff -burN ecore-1.7.9/configure.ac ecore-1.7.9-PS3/configure.ac
 --- ecore-1.7.9/configure.ac	2013-10-31 18:38:05.000000000 -0400
-+++ ecore-1.7.9-PS3/configure.ac	2014-07-02 13:54:25.600586320 -0400
++++ ecore-1.7.9-PS3/configure.ac	2014-07-03 18:39:35.301265399 -0400
 @@ -167,6 +167,7 @@
  want_ecore_evas_gl_sdl="no"
  want_ecore_evas_gl_cocoa="no"
@@ -40,9 +40,193 @@ diff -burN ecore-1.7.9/configure.ac ecore-1.7.9-PS3/configure.ac
    echo "    Software Framebuffer.......: $have_ecore_evas_fb"
    echo "    Software 8bit grayscale XCB: $have_ecore_evas_software_8_x11"
    echo "    Software 16bit X11.........: $have_ecore_evas_software_16_x11"
+diff -burN ecore-1.7.9/src/lib/ecore/ecore.c ecore-1.7.9-PS3/src/lib/ecore/ecore.c
+--- ecore-1.7.9/src/lib/ecore/ecore.c	2013-07-29 10:22:11.000000000 -0400
++++ ecore-1.7.9-PS3/src/lib/ecore/ecore.c	2014-07-03 19:02:37.250314518 -0400
+@@ -259,8 +259,11 @@
+     */
+      p = _thread_call;
+      _thread_call = NULL;
+-     _ecore_pipe_wait(p, 1, 0.1);
+-     _ecore_pipe_del(p);
++     if (p)
++       {
++         ecore_pipe_wait(p, 1, 0.1);
++         ecore_pipe_del(p);
++       }
+      eina_lock_free(&_thread_safety);
+      eina_condition_free(&_thread_cond);
+      eina_lock_free(&_thread_mutex);
+diff -burN ecore-1.7.9/src/lib/ecore/ecore_pipe.c ecore-1.7.9-PS3/src/lib/ecore/ecore_pipe.c
+--- ecore-1.7.9/src/lib/ecore/ecore_pipe.c	2013-07-29 10:22:11.000000000 -0400
++++ ecore-1.7.9-PS3/src/lib/ecore/ecore_pipe.c	2014-07-03 18:58:47.874306365 -0400
+@@ -461,6 +461,11 @@
+    int total = 0;
+ 
+    EINA_MAIN_LOOP_CHECK_RETURN_VAL(-1);
++   if (!ECORE_MAGIC_CHECK(p, ECORE_MAGIC_PIPE))
++     {
++        ECORE_MAGIC_FAIL(p, ECORE_MAGIC_PIPE, "ecore_pipe_wait");
++        return -1;
++     }
+    if (p->fd_read == PIPE_FD_INVALID)
+      return -1;
+ 
+diff -burN ecore-1.7.9/src/lib/ecore_evas/ecore_evas.c ecore-1.7.9-PS3/src/lib/ecore_evas/ecore_evas.c
+--- ecore-1.7.9/src/lib/ecore_evas/ecore_evas.c	2013-07-29 10:22:11.000000000 -0400
++++ ecore-1.7.9-PS3/src/lib/ecore_evas/ecore_evas.c	2014-07-03 18:57:34.747303766 -0400
+@@ -201,6 +201,12 @@
+ #else
+         return EINA_FALSE;
+ #endif
++     case ECORE_EVAS_ENGINE_GL_PSL1GHT:
++#ifdef BUILD_ECORE_EVAS_GL_PSL1GHT
++        return EINA_TRUE;
++#else
++        return EINA_FALSE;
++#endif
+      case ECORE_EVAS_ENGINE_WAYLAND_SHM:
+ #ifdef BUILD_ECORE_EVAS_WAYLAND_SHM
+         return EINA_TRUE;
+@@ -601,6 +607,22 @@
+ }
+ #endif
+ 
++#ifdef BUILD_ECORE_EVAS_GL_PSL1GHT
++static Ecore_Evas *
++_ecore_evas_constructor_gl_psl1ght(int x __UNUSED__, int y __UNUSED__, int w, int h, const char *extra_options)
++{
++   Ecore_Evas *ee;
++   char *name = NULL;
++
++   _ecore_evas_parse_extra_options_str(extra_options, "name=", &name);
++   ee = ecore_evas_gl_psl1ght_new(name, w, h);
++   free(name);
++
++   if (ee) ecore_evas_move(ee, x, y);
++   return ee;
++}
++#endif
++
+ #ifdef BUILD_ECORE_EVAS_WAYLAND_SHM
+ static Ecore_Evas *
+ _ecore_evas_constructor_wayland_shm(int x, int y, int w, int h, const char *extra_options)
+@@ -770,6 +792,9 @@
+ #endif
+ 
+   /* PS3 support */
++#ifdef BUILD_ECORE_EVAS_GL_PSL1GHT
++  {"gl_psl1ght", _ecore_evas_constructor_gl_psl1ght},
++#endif
+ #ifdef BUILD_ECORE_EVAS_PSL1GHT
+   {"psl1ght", _ecore_evas_constructor_psl1ght},
+ #endif
+diff -burN ecore-1.7.9/src/lib/ecore_evas/Ecore_Evas.h ecore-1.7.9-PS3/src/lib/ecore_evas/Ecore_Evas.h
+--- ecore-1.7.9/src/lib/ecore_evas/Ecore_Evas.h	2013-07-29 10:22:11.000000000 -0400
++++ ecore-1.7.9-PS3/src/lib/ecore_evas/Ecore_Evas.h	2014-07-03 18:45:46.482278592 -0400
+@@ -100,6 +100,7 @@
+ #define HAVE_ECORE_EVAS_WINCE 1
+ #define HAVE_ECORE_EVAS_EWS 1
+ #define HAVE_ECORE_EVAS_PSL1GHT 1
++#define HAVE_ECORE_EVAS_GL_PSL1GHT 1
+ #define HAVE_ECORE_EVAS_WAYLAND_SHM 1
+ #define HAVE_ECORE_EVAS_WAYLAND_EGL 1
+ 
+@@ -127,7 +128,8 @@
+    ECORE_EVAS_ENGINE_EWS,
+    ECORE_EVAS_ENGINE_PSL1GHT,
+    ECORE_EVAS_ENGINE_WAYLAND_SHM,
+-   ECORE_EVAS_ENGINE_WAYLAND_EGL
++   ECORE_EVAS_ENGINE_WAYLAND_EGL,
++   ECORE_EVAS_ENGINE_GL_PSL1GHT
+ } Ecore_Evas_Engine_Type;
+ 
+ typedef enum _Ecore_Evas_Avoid_Damage_Type
+@@ -1158,7 +1160,7 @@
+ 				      int w,
+ 				      int h);
+ 
+-EAPI Ecore_Evas *ecore_evas_psl1ght_new(const char* name, int w, int h);
++EAPI Ecore_Evas *ecore_evas_gl_psl1ght_new(const char* name, int w, int h);
+ 
+ 
+ /* generic manipulation calls */
+diff -burN ecore-1.7.9/src/lib/ecore_evas/ecore_evas_psl1ght.c ecore-1.7.9-PS3/src/lib/ecore_evas/ecore_evas_psl1ght.c
+--- ecore-1.7.9/src/lib/ecore_evas/ecore_evas_psl1ght.c	2013-07-29 10:22:11.000000000 -0400
++++ ecore-1.7.9-PS3/src/lib/ecore_evas/ecore_evas_psl1ght.c	2014-07-03 18:55:28.498299278 -0400
+@@ -21,6 +21,7 @@
+ };
+ 
+ static const char *ecore_evas_psl1ght_default = "EFL PSL1GHT";
++static const char *ecore_evas_gl_psl1ght_default = "EFL RSXGL PSL1GHT";
+ static int _ecore_evas_fps_debug = 0;
+ static Ecore_Poller *ecore_evas_event;
+ 
+@@ -409,8 +410,8 @@
+    NULL  // screen_dpi_get
+ };
+ 
+-EAPI Ecore_Evas *
+-ecore_evas_psl1ght_new(const char *name, int w, int h)
++static Ecore_Evas *
++_ecore_evas_psl1ght_new(const char *name, const char *engine, int w, int h)
+ {
+    void *einfo;
+    Ecore_Evas *ee;
+@@ -425,7 +426,7 @@
+ 
+    ee->engine.func = (Ecore_Evas_Engine_Func *)&_ecore_psl1ght_engine_func;
+ 
+-   ee->driver = "psl1ght";
++   ee->driver = engine;
+    if (name) ee->name = strdup(name);
+ 
+    if (w < 1) w = 1;
+@@ -449,7 +450,7 @@
+    /* init evas here */
+    ee->evas = evas_new();
+    evas_data_attach_set(ee->evas, ee);
+-   evas_output_method_set(ee->evas, evas_render_method_lookup("psl1ght"));
++   evas_output_method_set(ee->evas, evas_render_method_lookup(engine));
+ 
+    evas_output_size_set(ee->evas, w, h);
+    evas_output_viewport_set(ee->evas, 0, 0, w, h);
+@@ -503,6 +504,18 @@
+    return ee;
+ }
+ 
++EAPI Ecore_Evas *
++ecore_evas_psl1ght_new(const char *name, int w, int h)
++{
++  return _ecore_evas_psl1ght_new (name, "psl1ght", w, h);
++}
++
++EAPI Ecore_Evas *
++ecore_evas_gl_psl1ght_new(const char *name, int w, int h)
++{
++  return _ecore_evas_psl1ght_new (name, "gl_psl1ght", w, h);
++}
++
+ #else /* BUILD_ECORE_EVAS_PSL1GHT */
+ 
+ EAPI Ecore_Evas *
+@@ -510,6 +523,13 @@
+ {
+    ERR("OUTCH !");
+    return NULL;
++}
++
++EAPI Ecore_Evas *
++ecore_evas_gl_psl1ght_new(const char *name __UNUSED__, int w __UNUSED__, int h __UNUSED__)
++{
++   ERR("OUTCH !");
++   return NULL;
+ }
+ 
+ #endif /* BUILD_ECORE_EVAS_PSL1GHT */
 diff -burN ecore-1.7.9/src/lib/ecore_psl1ght/moveutil.h ecore-1.7.9-PS3/src/lib/ecore_psl1ght/moveutil.h
 --- ecore-1.7.9/src/lib/ecore_psl1ght/moveutil.h	1969-12-31 19:00:00.000000000 -0500
-+++ ecore-1.7.9-PS3/src/lib/ecore_psl1ght/moveutil.h	2014-07-02 13:55:33.445588731 -0400
++++ ecore-1.7.9-PS3/src/lib/ecore_psl1ght/moveutil.h	2014-07-03 18:39:35.302265399 -0400
 @@ -0,0 +1,43 @@
 +/*
 + * Copyright (C) Antonio José Ramos Márquez (bigboss)
@@ -89,7 +273,7 @@ diff -burN ecore-1.7.9/src/lib/ecore_psl1ght/moveutil.h ecore-1.7.9-PS3/src/lib/
 +#endif /* __MOVEUTIL_H__ */
 diff -burN ecore-1.7.9/src/lib/ecore_psl1ght/spursutil.h ecore-1.7.9-PS3/src/lib/ecore_psl1ght/spursutil.h
 --- ecore-1.7.9/src/lib/ecore_psl1ght/spursutil.h	1969-12-31 19:00:00.000000000 -0500
-+++ ecore-1.7.9-PS3/src/lib/ecore_psl1ght/spursutil.h	2014-07-02 13:55:33.446588732 -0400
++++ ecore-1.7.9-PS3/src/lib/ecore_psl1ght/spursutil.h	2014-07-03 18:39:35.302265399 -0400
 @@ -0,0 +1,24 @@
 +/*
 + * Copyright (C) Antonio José Ramos Márquez (bigboss)
