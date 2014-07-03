@@ -1,6 +1,6 @@
 diff -burN expedite-1.7.9/autogen.sh expedite-1.7.9-PS3/autogen.sh
 --- expedite-1.7.9/autogen.sh	1969-12-31 19:00:00.000000000 -0500
-+++ expedite-1.7.9-PS3/autogen.sh	2014-07-02 02:23:57.113113814 -0400
++++ expedite-1.7.9-PS3/autogen.sh	2014-07-03 18:29:46.012244453 -0400
 @@ -0,0 +1,16 @@
 +#!/bin/sh
 +
@@ -20,7 +20,7 @@ diff -burN expedite-1.7.9/autogen.sh expedite-1.7.9-PS3/autogen.sh
 +fi
 diff -burN expedite-1.7.9/configure.ac expedite-1.7.9-PS3/configure.ac
 --- expedite-1.7.9/configure.ac	2013-09-10 13:09:49.000000000 -0400
-+++ expedite-1.7.9-PS3/configure.ac	2014-07-02 02:23:57.113113814 -0400
++++ expedite-1.7.9-PS3/configure.ac	2014-07-03 18:29:46.012244453 -0400
 @@ -76,6 +76,10 @@
  # PSL1GHT
  EXPEDITE_CHECK_ENGINE([psl1ght], [PSL1GHT], "yes")
@@ -50,52 +50,9 @@ diff -burN expedite-1.7.9/configure.ac expedite-1.7.9-PS3/configure.ac
  echo "    Software X11 16 bits.........: ${have_software_16_x11}"
  echo "    Software WinCE 16 bits.......: ${have_software_16_wince}"
  echo
-diff -burN expedite-1.7.9/Makefile.in expedite-1.7.9-PS3/Makefile.in
---- expedite-1.7.9/Makefile.in	2013-10-31 18:52:33.000000000 -0400
-+++ expedite-1.7.9-PS3/Makefile.in	2014-07-02 02:23:35.897113060 -0400
-@@ -64,6 +64,14 @@
- pkglibdir = $(libdir)/@PACKAGE@
- pkglibexecdir = $(libexecdir)/@PACKAGE@
- am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
-+EXPEDITE=expedite-1.7.9
-+EXPEDITE_APPID=EXPEDITE_
-+EXPEDITE_CONTENTID="UP0001-$appid-0000000000000000"
-+EXPEDITE_DATADIR=/dev_hdd0/game/${EXPEDITE_APPID}/USRDIR
-+EXPEDITE_LOGO=../data/logo.png
-+EXPEDITE_NAME=expedite
-+EXPEDITE_TITLE=Expedite - Evas Benchmarking Suite
-+PSL1GHT_FSELF=make_self
- install_sh_DATA = $(install_sh) -c -m 644
- install_sh_PROGRAM = $(install_sh) -c
- install_sh_SCRIPT = $(install_sh) -c
-@@ -703,6 +711,24 @@
- 	    install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
- 	    "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'" install; \
- 	fi
-+
-+pkg:
-+	sed -e 's/Test - PSL1GHT/$(EXPEDITE_TITLE)/' -e 's/TEST00000/$(EXPEDITE_APPID)/' $(PS3DEV)/bin/sfo.xml > ps3sfo.xml
-+	cp src/bin/$(EXPEDITE_NAME) $(EXPEDITE_NAME).elf
-+	sprxlinker $(EXPEDITE_NAME).elf
-+	$(PSL1GHT_FSELF) $(EXPEDITE_NAME).elf $(EXPEDITE_NAME).self
-+	mkdir -p pkg/USRDIR
-+	cp $(EXPEDITE_LOGO) pkg/ICON0.PNG
-+	make_self_npdrm $(EXPEDITE_NAME).elf pkg/USRDIR/EBOOT.BIN $(EXPEDITE_CONTENTID)
-+	sfo.py --title "$(EXPEDITE_TITLE)" --appid "$(EXPEDITE_APPID)" -f ps3sfo.xml pkg/PARAM.SFO
-+	make DESTDIR=`pwd`/temp_install install
-+	cp -rf temp_install$(EXPEDITE_DATADIR)* pkg/USRDIR/
-+	rm -rf temp_install
-+	pkg.py --contentid $(EXPEDITE_CONTENTID) pkg/ $(EXPEDITE_NAME).pkg
-+	cp $(EXPEDITE_NAME).pkg $(EXPEDITE_NAME).retail.pkg
-+	package_finalize $(EXPEDITE_NAME).retail.pkg
-+	rm -rf pkg
-+
- mostlyclean-generic:
- 
- clean-generic:
 diff -burN expedite-1.7.9/make_pkg.sh expedite-1.7.9-PS3/make_pkg.sh
 --- expedite-1.7.9/make_pkg.sh	1969-12-31 19:00:00.000000000 -0500
-+++ expedite-1.7.9-PS3/make_pkg.sh	2014-07-02 16:00:56.164856114 -0400
++++ expedite-1.7.9-PS3/make_pkg.sh	2014-07-03 18:29:46.013244453 -0400
 @@ -0,0 +1,31 @@
 +#!/bin/bash
 +set -e
@@ -130,7 +87,7 @@ diff -burN expedite-1.7.9/make_pkg.sh expedite-1.7.9-PS3/make_pkg.sh
 +
 diff -burN expedite-1.7.9/src/bin/engine_gl_psl1ght.c expedite-1.7.9-PS3/src/bin/engine_gl_psl1ght.c
 --- expedite-1.7.9/src/bin/engine_gl_psl1ght.c	1969-12-31 19:00:00.000000000 -0500
-+++ expedite-1.7.9-PS3/src/bin/engine_gl_psl1ght.c	2014-07-02 02:23:57.114113814 -0400
++++ expedite-1.7.9-PS3/src/bin/engine_gl_psl1ght.c	2014-07-03 18:29:46.013244453 -0400
 @@ -0,0 +1,284 @@
 +#include "main.h"
 +
@@ -418,7 +375,7 @@ diff -burN expedite-1.7.9/src/bin/engine_gl_psl1ght.c expedite-1.7.9-PS3/src/bin
 +
 diff -burN expedite-1.7.9/src/bin/engine_gl_psl1ght.h expedite-1.7.9-PS3/src/bin/engine_gl_psl1ght.h
 --- expedite-1.7.9/src/bin/engine_gl_psl1ght.h	1969-12-31 19:00:00.000000000 -0500
-+++ expedite-1.7.9-PS3/src/bin/engine_gl_psl1ght.h	2014-07-02 02:23:57.114113814 -0400
++++ expedite-1.7.9-PS3/src/bin/engine_gl_psl1ght.h	2014-07-03 18:29:46.013244453 -0400
 @@ -0,0 +1,8 @@
 +#ifndef ENGINE_SOFTWARE_GL_PSL1GHT_H
 +#define ENGINE_SOFTWARE_GL_PSL1GHT_H
@@ -430,7 +387,7 @@ diff -burN expedite-1.7.9/src/bin/engine_gl_psl1ght.h expedite-1.7.9-PS3/src/bin
 +#endif
 diff -burN expedite-1.7.9/src/bin/engine_psl1ght.h expedite-1.7.9-PS3/src/bin/engine_psl1ght.h
 --- expedite-1.7.9/src/bin/engine_psl1ght.h	1969-12-31 19:00:00.000000000 -0500
-+++ expedite-1.7.9-PS3/src/bin/engine_psl1ght.h	2014-07-02 02:23:35.897113060 -0400
++++ expedite-1.7.9-PS3/src/bin/engine_psl1ght.h	2014-07-03 18:29:46.013244453 -0400
 @@ -0,0 +1,8 @@
 +#ifndef ENGINE_SOFTWARE_PSL1GHT_H
 +#define ENGINE_SOFTWARE_PSL1GHT_H
@@ -440,9 +397,35 @@ diff -burN expedite-1.7.9/src/bin/engine_psl1ght.h expedite-1.7.9-PS3/src/bin/en
 +void engine_psl1ght_shutdown(void);
 +
 +#endif
+diff -burN expedite-1.7.9/src/bin/main.c expedite-1.7.9-PS3/src/bin/main.c
+--- expedite-1.7.9/src/bin/main.c	2013-08-01 10:39:01.000000000 -0400
++++ expedite-1.7.9-PS3/src/bin/main.c	2014-07-03 18:34:24.965254368 -0400
+@@ -1176,6 +1176,9 @@
+ #if HAVE_EVAS_PSL1GHT
+   { "psl1ght",    engine_psl1ght_args, engine_psl1ght_loop, engine_psl1ght_shutdown },
+ #endif
++#if HAVE_EVAS_GL_PSL1GHT
++  { "gl-psl1ght",    engine_gl_psl1ght_args, engine_gl_psl1ght_loop, engine_gl_psl1ght_shutdown },
++#endif
+ #if HAVE_EVAS_SOFTWARE_16_X11
+   { "x11-16",engine_software_16_x11_args, engine_software_16_x11_loop, engine_software_16_x11_shutdown },
+ #endif
+diff -burN expedite-1.7.9/src/bin/main.h expedite-1.7.9-PS3/src/bin/main.h
+--- expedite-1.7.9/src/bin/main.h	2013-08-01 10:39:01.000000000 -0400
++++ expedite-1.7.9-PS3/src/bin/main.h	2014-07-03 18:34:57.593255528 -0400
+@@ -71,6 +71,9 @@
+ #if HAVE_EVAS_PSL1GHT
+ #include "engine_psl1ght.h"
+ #endif
++#if HAVE_EVAS_PSL1GHT
++#include "engine_gl_psl1ght.h"
++#endif
+ #if HAVE_EVAS_SOFTWARE_16_X11
+ #include "engine_software_16_x11.h"
+ #endif
 diff -burN expedite-1.7.9/src/bin/Makefile.am expedite-1.7.9-PS3/src/bin/Makefile.am
 --- expedite-1.7.9/src/bin/Makefile.am	2013-08-01 10:39:01.000000000 -0400
-+++ expedite-1.7.9-PS3/src/bin/Makefile.am	2014-07-02 02:24:07.469114182 -0400
++++ expedite-1.7.9-PS3/src/bin/Makefile.am	2014-07-03 18:29:46.014244453 -0400
 @@ -144,7 +144,7 @@
  
  expedite_CFLAGS = @WIN32_CFLAGS@
