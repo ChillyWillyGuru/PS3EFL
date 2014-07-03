@@ -245,7 +245,7 @@ diff -burN evas-1.7.9/src/modules/engines/gl_common/evas_gl_common.h evas-1.7.9-
  
 diff -burN evas-1.7.9/src/modules/engines/gl_common/evas_gl_context.c evas-1.7.9-PS3/src/modules/engines/gl_common/evas_gl_context.c
 --- evas-1.7.9/src/modules/engines/gl_common/evas_gl_context.c	2013-07-29 10:25:43.000000000 -0400
-+++ evas-1.7.9-PS3/src/modules/engines/gl_common/evas_gl_context.c	2014-07-03 19:15:18.059341559 -0400
++++ evas-1.7.9-PS3/src/modules/engines/gl_common/evas_gl_context.c	2014-07-03 19:32:42.533378683 -0400
 @@ -3,7 +3,8 @@
  #ifdef HAVE_DLSYM
  # include <dlfcn.h>      /* dlopen,dlclose,etc */
@@ -270,7 +270,7 @@ diff -burN evas-1.7.9/src/modules/engines/gl_common/evas_gl_context.c evas-1.7.9
 +   glsym_glProgramParameteri = NULL;
 +   glsym_glReleaseShaderCompiler = glReleaseShaderCompiler;
 +   return;
-++#endif
++#endif
 +
     /* FIXME: If using the SDL engine, we should use SDL_GL_GetProcAddress
      * instead of dlsym
