@@ -36,9 +36,7 @@ PKG_CONFIG_LIBDIR="${PS3DEV}/portlibs/ppu/lib/pkgconfig" \
 PKG_CONFIG_PATH="${PS3DEV}/portlibs/ppu/lib/pkgconfig" \
 PKG_CONFIG="pkg-config --static" \
 ../configure --prefix="${PS3DEV}/portlibs/ppu" --host=powerpc64-ps3-elf \
-	--disable-ecore-x --disable-ecore-evas-software-8-x11 \
-	--disable-ecore-evas-software-x11 --disable-ecore-evas-opengl-x11 \
-	--disable-ecore-evas-software-16-x11 --disable-ecore-ipc \
+	--disable-ecore-x --disable-ecore-ipc \
 	--enable-ecore-sdl --enable-ecore-psl1ght --enable-ecore-evas-psl1ght \
 	--enable-ecore-evas-gl-psl1ght --enable-ecore-con --enable-cares \
 	--enable-option-checking
