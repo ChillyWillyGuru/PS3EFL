@@ -1,6 +1,6 @@
 diff -burN evas-1.7.9/configure.ac evas-1.7.9-PS3/configure.ac
 --- evas-1.7.9/configure.ac	2013-10-18 12:58:34.000000000 -0400
-+++ evas-1.7.9-PS3/configure.ac	2014-07-02 14:44:48.962693780 -0400
++++ evas-1.7.9-PS3/configure.ac	2014-07-03 00:43:24.189970327 -0400
 @@ -110,6 +110,7 @@
  want_evas_engine_fb="no"
  want_evas_engine_directfb="no"
@@ -62,7 +62,7 @@ diff -burN evas-1.7.9/configure.ac evas-1.7.9-PS3/configure.ac
  echo "  Software 16bit ............: $have_evas_engine_software_16"
 diff -burN evas-1.7.9/evas-gl-psl1ght.pc.in evas-1.7.9-PS3/evas-gl-psl1ght.pc.in
 --- evas-1.7.9/evas-gl-psl1ght.pc.in	1969-12-31 19:00:00.000000000 -0500
-+++ evas-1.7.9-PS3/evas-gl-psl1ght.pc.in	2014-07-02 15:10:27.700748472 -0400
++++ evas-1.7.9-PS3/evas-gl-psl1ght.pc.in	2014-07-03 00:43:24.189970327 -0400
 @@ -0,0 +1,3 @@
 +Name: evas-gl-psl1ght
 +Description: Evas RSXGL PSL1GHT engine
@@ -70,7 +70,7 @@ diff -burN evas-1.7.9/evas-gl-psl1ght.pc.in evas-1.7.9-PS3/evas-gl-psl1ght.pc.in
 \ No newline at end of file
 diff -burN evas-1.7.9/m4/evas_check_engine.m4 evas-1.7.9-PS3/m4/evas_check_engine.m4
 --- evas-1.7.9/m4/evas_check_engine.m4	2013-07-29 10:25:43.000000000 -0400
-+++ evas-1.7.9-PS3/m4/evas_check_engine.m4	2014-07-02 15:07:34.666742322 -0400
++++ evas-1.7.9-PS3/m4/evas_check_engine.m4	2014-07-03 00:43:24.190970327 -0400
 @@ -806,6 +806,45 @@
  
  ])
@@ -119,7 +119,7 @@ diff -burN evas-1.7.9/m4/evas_check_engine.m4 evas-1.7.9-PS3/m4/evas_check_engin
  
 diff -burN evas-1.7.9/Makefile.am evas-1.7.9-PS3/Makefile.am
 --- evas-1.7.9/Makefile.am	2013-07-29 10:25:43.000000000 -0400
-+++ evas-1.7.9-PS3/Makefile.am	2014-07-02 14:48:44.090702138 -0400
++++ evas-1.7.9-PS3/Makefile.am	2014-07-03 00:43:24.190970327 -0400
 @@ -43,6 +43,7 @@
  evas-direct3d.pc.in \
  evas-software-16-wince.pc.in \
@@ -141,7 +141,7 @@ diff -burN evas-1.7.9/Makefile.am evas-1.7.9-PS3/Makefile.am
  endif
 diff -burN evas-1.7.9/src/lib/Makefile.am evas-1.7.9-PS3/src/lib/Makefile.am
 --- evas-1.7.9/src/lib/Makefile.am	2013-07-29 10:25:43.000000000 -0400
-+++ evas-1.7.9-PS3/src/lib/Makefile.am	2014-07-02 14:58:19.706722597 -0400
++++ evas-1.7.9-PS3/src/lib/Makefile.am	2014-07-03 00:43:24.190970327 -0400
 @@ -48,6 +48,13 @@
  EVAS_STATIC_MODULE += ../modules/engines/psl1ght/libevas_engine_psl1ght.la
  EVAS_STATIC_LIBADD += @evas_engine_psl1ght_libs@
@@ -156,19 +156,59 @@ diff -burN evas-1.7.9/src/lib/Makefile.am evas-1.7.9-PS3/src/lib/Makefile.am
  if EVAS_STATIC_BUILD_SOFTWARE_16
  SUBDIRS += ../modules/engines/software_16/
  EVAS_STATIC_MODULE += ../modules/engines/software_16/libevas_engine_software_16.la
+diff -burN evas-1.7.9/src/modules/engines/gl_common/evas_gl_common.h evas-1.7.9-PS3/src/modules/engines/gl_common/evas_gl_common.h
+--- evas-1.7.9/src/modules/engines/gl_common/evas_gl_common.h	2013-07-29 10:25:43.000000000 -0400
++++ evas-1.7.9-PS3/src/modules/engines/gl_common/evas_gl_common.h	2014-07-03 01:31:34.882073072 -0400
+@@ -19,6 +19,11 @@
+ # include <OpenGL/gl.h>
+ # include <OpenGL/glext.h>
+ #else
++# ifdef BUILD_ENGINE_GL_PSL1GHT
++#  define GL3_PROTOTYPES
++#  include <GL3/gl3.h>
++#  include <GL3/gl3ext.h>
++# else
+ # ifdef _EVAS_ENGINE_SDL_H
+ #  if defined(GLES_VARIETY_S3C6410) || defined(GLES_VARIETY_SGX)
+ #   include <SDL/SDL_opengles.h>
+@@ -34,8 +39,9 @@
+ #    include <GLES2/gl2ext.h>
+ #   endif
+ #  else
+-#   include <GL/gl.h>
+-#   include <GL/glext.h>
++#    include <GL3/gl3.h>
++#    include <GL3/gl3ext.h>
++#   endif
+ #  endif
+ # endif
+ #endif
+diff -burN evas-1.7.9/src/modules/engines/gl_common/evas_gl_context.c evas-1.7.9-PS3/src/modules/engines/gl_common/evas_gl_context.c
+--- evas-1.7.9/src/modules/engines/gl_common/evas_gl_context.c	2013-07-29 10:25:43.000000000 -0400
++++ evas-1.7.9-PS3/src/modules/engines/gl_common/evas_gl_context.c	2014-07-03 01:27:24.258064164 -0400
+@@ -3,7 +3,8 @@
+ #ifdef HAVE_DLSYM
+ # include <dlfcn.h>      /* dlopen,dlclose,etc */
+ #else
+-# error gl_common should not get compiled if dlsym is not found on the system!
++/* If we can't find the symbols, let's assume they don't exist */
++#define dlsym(...) NULL
+ #endif
+ 
+ #define PRG_INVALID 0xffffffff
 diff -burN evas-1.7.9/src/modules/engines/gl_psl1ght/.deps/evas_engine.Plo evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/.deps/evas_engine.Plo
 --- evas-1.7.9/src/modules/engines/gl_psl1ght/.deps/evas_engine.Plo	1969-12-31 19:00:00.000000000 -0500
-+++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/.deps/evas_engine.Plo	2014-07-02 14:45:43.358695714 -0400
++++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/.deps/evas_engine.Plo	2014-07-03 00:43:24.191970327 -0400
 @@ -0,0 +1 @@
 +# dummy
 diff -burN evas-1.7.9/src/modules/engines/gl_psl1ght/.deps/module_la-evas_engine.Plo evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/.deps/module_la-evas_engine.Plo
 --- evas-1.7.9/src/modules/engines/gl_psl1ght/.deps/module_la-evas_engine.Plo	1969-12-31 19:00:00.000000000 -0500
-+++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/.deps/module_la-evas_engine.Plo	2014-07-02 14:45:43.358695714 -0400
++++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/.deps/module_la-evas_engine.Plo	2014-07-03 00:43:24.191970327 -0400
 @@ -0,0 +1 @@
 +# dummy
 diff -burN evas-1.7.9/src/modules/engines/gl_psl1ght/evas_engine.c evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/evas_engine.c
 --- evas-1.7.9/src/modules/engines/gl_psl1ght/evas_engine.c	1969-12-31 19:00:00.000000000 -0500
-+++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/evas_engine.c	2014-07-02 14:45:43.357695714 -0400
++++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/evas_engine.c	2014-07-03 00:43:24.192970327 -0400
 @@ -0,0 +1,1276 @@
 +
 +#include "config.h"
@@ -1448,7 +1488,7 @@ diff -burN evas-1.7.9/src/modules/engines/gl_psl1ght/evas_engine.c evas-1.7.9-PS
 +#endif
 diff -burN evas-1.7.9/src/modules/engines/gl_psl1ght/Evas_Engine_GL_PSL1GHT.h evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/Evas_Engine_GL_PSL1GHT.h
 --- evas-1.7.9/src/modules/engines/gl_psl1ght/Evas_Engine_GL_PSL1GHT.h	1969-12-31 19:00:00.000000000 -0500
-+++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/Evas_Engine_GL_PSL1GHT.h	2014-07-02 14:45:43.357695714 -0400
++++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/Evas_Engine_GL_PSL1GHT.h	2014-07-03 00:43:24.192970327 -0400
 @@ -0,0 +1,16 @@
 +#ifndef _EVAS_ENGINE_GL_PSL1GHT_H
 +#define _EVAS_ENGINE_GL_PSL1GHT_H
@@ -1468,7 +1508,7 @@ diff -burN evas-1.7.9/src/modules/engines/gl_psl1ght/Evas_Engine_GL_PSL1GHT.h ev
 +
 diff -burN evas-1.7.9/src/modules/engines/gl_psl1ght/evas_engine.h evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/evas_engine.h
 --- evas-1.7.9/src/modules/engines/gl_psl1ght/evas_engine.h	1969-12-31 19:00:00.000000000 -0500
-+++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/evas_engine.h	2014-07-02 14:45:43.357695714 -0400
++++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/evas_engine.h	2014-07-03 00:43:24.192970327 -0400
 @@ -0,0 +1,31 @@
 +#ifndef EVAS_ENGINE_H
 +#define EVAS_ENGINE_H
@@ -1503,7 +1543,7 @@ diff -burN evas-1.7.9/src/modules/engines/gl_psl1ght/evas_engine.h evas-1.7.9-PS
 +#endif
 diff -burN evas-1.7.9/src/modules/engines/gl_psl1ght/Makefile evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/Makefile
 --- evas-1.7.9/src/modules/engines/gl_psl1ght/Makefile	1969-12-31 19:00:00.000000000 -0500
-+++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/Makefile	2014-07-02 14:45:43.357695714 -0400
++++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/Makefile	2014-07-03 00:43:24.193970327 -0400
 @@ -0,0 +1,899 @@
 +# Makefile.in generated by automake 1.13.4 from Makefile.am.
 +# src/modules/engines/gl_psl1ght/Makefile.  Generated from Makefile.in by configure.
@@ -2406,7 +2446,7 @@ diff -burN evas-1.7.9/src/modules/engines/gl_psl1ght/Makefile evas-1.7.9-PS3/src
 +.NOEXPORT:
 diff -burN evas-1.7.9/src/modules/engines/gl_psl1ght/Makefile.am evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/Makefile.am
 --- evas-1.7.9/src/modules/engines/gl_psl1ght/Makefile.am	1969-12-31 19:00:00.000000000 -0500
-+++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/Makefile.am	2014-07-02 14:45:43.357695714 -0400
++++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/Makefile.am	2014-07-03 00:43:24.193970327 -0400
 @@ -0,0 +1,47 @@
 +
 +MAINTAINERCLEANFILES = Makefile.in
@@ -2457,7 +2497,7 @@ diff -burN evas-1.7.9/src/modules/engines/gl_psl1ght/Makefile.am evas-1.7.9-PS3/
 +EXTRA_DIST = evas_engine.h
 diff -burN evas-1.7.9/src/modules/engines/gl_psl1ght/Makefile.in evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/Makefile.in
 --- evas-1.7.9/src/modules/engines/gl_psl1ght/Makefile.in	1969-12-31 19:00:00.000000000 -0500
-+++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/Makefile.in	2014-07-02 14:45:43.357695714 -0400
++++ evas-1.7.9-PS3/src/modules/engines/gl_psl1ght/Makefile.in	2014-07-03 00:43:24.194970327 -0400
 @@ -0,0 +1,899 @@
 +# Makefile.in generated by automake 1.13.4 from Makefile.am.
 +# @configure_input@
@@ -3360,7 +3400,7 @@ diff -burN evas-1.7.9/src/modules/engines/gl_psl1ght/Makefile.in evas-1.7.9-PS3/
 +.NOEXPORT:
 diff -burN evas-1.7.9/src/modules/engines/Makefile.am evas-1.7.9-PS3/src/modules/engines/Makefile.am
 --- evas-1.7.9/src/modules/engines/Makefile.am	2013-07-29 10:25:43.000000000 -0400
-+++ evas-1.7.9-PS3/src/modules/engines/Makefile.am	2014-07-02 14:55:02.394715584 -0400
++++ evas-1.7.9-PS3/src/modules/engines/Makefile.am	2014-07-03 00:43:24.194970327 -0400
 @@ -21,6 +21,9 @@
  if !EVAS_STATIC_BUILD_PSL1GHT
  SUBDIRS += psl1ght
@@ -3373,7 +3413,7 @@ diff -burN evas-1.7.9/src/modules/engines/Makefile.am evas-1.7.9-PS3/src/modules
  SUBDIRS += gl_common
 diff -burN evas-1.7.9/src/modules/engines/software_16_sdl/Makefile.am evas-1.7.9-PS3/src/modules/engines/software_16_sdl/Makefile.am
 --- evas-1.7.9/src/modules/engines/software_16_sdl/Makefile.am	2013-07-29 10:25:43.000000000 -0400
-+++ evas-1.7.9-PS3/src/modules/engines/software_16_sdl/Makefile.am	2014-07-02 15:10:54.706749432 -0400
++++ evas-1.7.9-PS3/src/modules/engines/software_16_sdl/Makefile.am	2014-07-03 00:43:24.195970327 -0400
 @@ -2,7 +2,7 @@
  
  MAINTAINERCLEANFILES = Makefile.in
