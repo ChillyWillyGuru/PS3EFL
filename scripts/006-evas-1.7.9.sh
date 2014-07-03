@@ -38,16 +38,18 @@ PKG_CONFIG_PATH="${PS3DEV}/portlibs/ppu/lib/pkgconfig" \
 PKG_CONFIG="pkg-config --static" \
 ../configure --prefix="${PS3DEV}/portlibs/ppu" --host=powerpc64-ps3-elf \
 	--disable-async-events --disable-async-preload \
-	--enable-software-sdl=static --enable-software-16-sdl=static \
+	--enable-software-16-sdl=static \
 	--disable-shared --enable-buffer=static --enable-image-loader-eet=static \
 	--enable-font-loader-eet --enable-image-loader-gif=static \
 	--enable-image-loader-jpeg=static  --enable-image-loader-png=static \
-	 --enable-image-loader-tiff=static --enable-image-loader-bmp=static \
+	--enable-image-loader-tiff=static --enable-image-loader-bmp=static \
 	--enable-image-loader-xpm=static  --enable-image-loader-psd=static \
 	--enable-image-loader-pmaps=static  --enable-image-loader-ico=static \
 	--enable-image-loader-wbmp=static --enable-image-loader-tga=static \
 	--enable-static-software-generic --enable-static-software-16 \
-	--enable-psl1ght=static --enable-gl-psl1ght=static --enable-fontconfig
+	--enable-psl1ght=static --enable-gl-psl1ght=static --enable-fontconfig \
+	--enable-pixman --enable-pixman-font --enable-pixman-rect --enable-pixman-line \
+	--enable-pixman-poly --enable-pixman-image --enable-pixman-image-scale-sample
 
 ## Make and install
 ${MAKE:-make} all && ${MAKE:-make} install
