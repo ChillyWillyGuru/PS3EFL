@@ -1,7 +1,7 @@
 #!/bin/sh
-# toolchain.sh by Dan Peori (dan.peori@oopo.net)
+# ps3efl.sh by Dan Peori (dan.peori@oopo.net) (Updated by Spork Schivago (SporkSchivago@gmail.com))
 
-## Enter the ps3toolchain directory.
+## Enter the PS3EFL directory.
 cd "`dirname $0`" || { echo "ERROR: Could not enter the ps3toolchain directory."; exit 1; }
 
 ## Create the build directory.
