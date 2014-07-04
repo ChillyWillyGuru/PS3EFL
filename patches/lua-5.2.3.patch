@@ -1,6 +1,6 @@
 diff -burN lua-5.2.3/etc/lua.pc lua-5.2.3-PS3/etc/lua.pc
 --- lua-5.2.3/etc/lua.pc	1969-12-31 19:00:00.000000000 -0500
-+++ lua-5.2.3-PS3/etc/lua.pc	2013-12-19 18:23:23.208690539 -0500
++++ lua-5.2.3-PS3/etc/lua.pc	2014-07-03 22:39:19.294776653 -0400
 @@ -0,0 +1,31 @@
 +# lua.pc -- pkg-config data for Lua
 +
@@ -35,7 +35,7 @@ diff -burN lua-5.2.3/etc/lua.pc lua-5.2.3-PS3/etc/lua.pc
 +# (end of lua.pc)
 diff -burN lua-5.2.3/Makefile lua-5.2.3-PS3/Makefile
 --- lua-5.2.3/Makefile	2013-11-09 19:49:35.000000000 -0500
-+++ lua-5.2.3-PS3/Makefile	2013-12-19 16:25:49.289916269 -0500
++++ lua-5.2.3-PS3/Makefile	2014-07-03 22:39:19.294776653 -0400
 @@ -36,7 +36,7 @@
  # == END OF USER SETTINGS -- NO NEED TO CHANGE ANYTHING BELOW THIS LINE =======
  
@@ -47,7 +47,7 @@ diff -burN lua-5.2.3/Makefile lua-5.2.3-PS3/Makefile
  TO_BIN= lua luac
 diff -burN lua-5.2.3/src/Makefile lua-5.2.3-PS3/src/Makefile
 --- lua-5.2.3/src/Makefile	2013-11-11 06:45:49.000000000 -0500
-+++ lua-5.2.3-PS3/src/Makefile	2013-12-19 16:51:09.040310403 -0500
++++ lua-5.2.3-PS3/src/Makefile	2014-07-03 22:42:26.611783311 -0400
 @@ -26,7 +26,7 @@
  
  # == END OF USER SETTINGS -- NO NEED TO CHANGE ANYTHING BELOW THIS LINE =======
@@ -63,9 +63,9 @@ diff -burN lua-5.2.3/src/Makefile lua-5.2.3-PS3/src/Makefile
  
 +ps3:
 +	$(MAKE) $(ALL) \
-+	"CC=powerpc64-ps3-elf-gcc" "CXX=powerpc64-ps3-elf-g++" \
-+	"AR=powerpc64-ps3-elf-ar cru" "RANLIB=powerpc64-ps3-elf-ranlib" \
-+	"MYCFLAGS=" "MYLIBS=-lm"
++	CC="powerpc64-ps3-elf-gcc" CXX="powerpc64-ps3-elf-g++" \
++	AR="powerpc64-ps3-elf-ar cru" RANLIB="powerpc64-ps3-elf-ranlib" \
++	MYCFLAGS="" MYLIBS="-lm"
 +
  macosx:
  	$(MAKE) $(ALL) SYSCFLAGS="-DLUA_USE_MACOSX" SYSLIBS="-lreadline" CC=cc
