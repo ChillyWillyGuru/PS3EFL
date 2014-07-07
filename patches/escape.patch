@@ -1,7 +1,19 @@
 diff -burN escape/src/lib/Escape.h escape-PS3/src/lib/Escape.h
---- escape/src/lib/Escape.h	2014-07-06 22:04:25.236915053 -0400
-+++ escape-PS3/src/lib/Escape.h	2014-07-06 22:18:27.206944979 -0400
-@@ -49,4 +49,7 @@
+--- escape/src/lib/Escape.h	2014-07-06 22:57:12.565027630 -0400
++++ escape-PS3/src/lib/Escape.h	2014-07-06 22:56:44.664026638 -0400
+@@ -4,6 +4,11 @@
+ #ifndef EAPI
+ #define EAPI
+ #endif /* EAPI */
++
++#ifdef __UNUSED__
++#undef __UNUSED__
++#endif
++
+ #define __UNUSED__ __attribute__((unused))
+ 
+ #include <unistd.h>
+@@ -49,4 +54,7 @@
  }
  #endif
  
@@ -10,7 +22,7 @@ diff -burN escape/src/lib/Escape.h escape-PS3/src/lib/Escape.h
 +
  #endif /* __ESCAPE_H__ */
 diff -burN escape/src/lib/escape_unistd.c escape-PS3/src/lib/escape_unistd.c
---- escape/src/lib/escape_unistd.c	2014-07-06 22:04:25.238915053 -0400
+--- escape/src/lib/escape_unistd.c	2014-07-06 22:57:12.567027630 -0400
 +++ escape-PS3/src/lib/escape_unistd.c	2014-07-06 22:20:36.422949572 -0400
 @@ -13,7 +13,7 @@
  #include <arpa/inet.h>
