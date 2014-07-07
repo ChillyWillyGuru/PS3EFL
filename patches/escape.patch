@@ -1,0 +1,33 @@
+diff -burN escape/src/lib/Escape.h escape-PS3/src/lib/Escape.h
+--- escape/src/lib/Escape.h	2014-07-06 22:04:25.236915053 -0400
++++ escape-PS3/src/lib/Escape.h	2014-07-06 22:18:27.206944979 -0400
+@@ -49,4 +49,7 @@
+ }
+ #endif
+ 
++/* To prevent implicit declaration of function */
++extern int closesocket(int socket);
++
+ #endif /* __ESCAPE_H__ */
+diff -burN escape/src/lib/escape_unistd.c escape-PS3/src/lib/escape_unistd.c
+--- escape/src/lib/escape_unistd.c	2014-07-06 22:04:25.238915053 -0400
++++ escape-PS3/src/lib/escape_unistd.c	2014-07-06 22:20:36.422949572 -0400
+@@ -13,7 +13,7 @@
+ #include <arpa/inet.h>
+ #include <net/net.h>
+ #include <string.h>
+-#include <libiberty.h>
++#include <libiberty/libiberty.h>
+ #include <sys/stat.h>
+ 
+ #include "Escape.h"
+@@ -104,7 +104,7 @@
+    int socket2 = -1;
+    fd_set read_set;
+    fd_set write_set;
+-   int len;
++   socklen_t len;
+ 
+    temp = socket (AF_INET, SOCK_STREAM, 0);
+ 
+Binary files escape/.svn/wc.db and escape-PS3/.svn/wc.db differ
