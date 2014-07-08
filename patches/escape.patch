@@ -24,15 +24,6 @@ diff -burN escape/src/lib/Escape.h escape-PS3/src/lib/Escape.h
 diff -burN escape/src/lib/escape_unistd.c escape-PS3/src/lib/escape_unistd.c
 --- escape/src/lib/escape_unistd.c	2014-07-06 22:57:12.567027630 -0400
 +++ escape-PS3/src/lib/escape_unistd.c	2014-07-06 22:20:36.422949572 -0400
-@@ -13,7 +13,7 @@
- #include <arpa/inet.h>
- #include <net/net.h>
- #include <string.h>
--#include <libiberty.h>
-+#include <libiberty/libiberty.h>
- #include <sys/stat.h>
- 
- #include "Escape.h"
 @@ -104,7 +104,7 @@
     int socket2 = -1;
     fd_set read_set;
