@@ -46,7 +46,7 @@ PKG_CONFIG_LIBDIR="${PS3DEV}/portlibs/ppu/lib/pkgconfig" \
 PKG_CONFIG_PATH="${PS3DEV}/portlibs/ppu/lib/pkgconfig" \
 PKG_CONFIG="pkg-config --static" \
 ../configure --prefix="${PS3DEV}/portlibs/ppu" --host=powerpc64-ps3-elf \
---datadir=$ESKISS_DATADIR --with-edje-cc=${EDJE_CC} \
+--datadir=${ESKISS_DATADIR} --with-edje-cc=${EDJE_CC} \
 --libdir=${PS3DEV}/portlibs/ppu/lib \
 --includedir=${PS3DEV}/portlibs/ppu/include
 
