@@ -21,7 +21,7 @@ fi
 if [ -f ./autogen.sh ]; then
 	echo -ne "Running autogen on ${EXPEDITE}, please wait : "
 	chmod +x ./autogen.sh
-	NOCONFIGURE=1 ./autogen.sh >& ../build-logs/autogen_${EXPEDITE}.log  || \
+	NOCONFIGURE=1 ./autogen.sh >../build-logs/autogen_${EXPEDITE}.log  2>&1 || \
 	(echo "Error!" && \
 	(tail ../build-logs/autogen_${EXPEDITE}.log || true) && \
 	echo -ne "\n\nSee autogen_${EXPEDITE}.log in the build-logs directory for details.\n" && \

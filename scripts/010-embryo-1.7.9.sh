@@ -17,7 +17,7 @@ fi
 
 ## Run Autogen
 echo -ne "Running autogen on ${EMBRYO}, please wait : "
-NOCONFIGURE=1 ./autogen.sh >& ../build-logs/autogen_${EMBRYO}.log  || \
+NOCONFIGURE=1 ./autogen.sh >../build-logs/autogen_${EMBRYO}.log  2>&1 || \
 	(echo "Error!" && \
 	(tail ../build-logs/autogen_${EMBRYO}.log || true) && \
 	echo -ne "\n\nSee autogen_${EMBRYO}.log in the build-logs directory for details.\n" && \

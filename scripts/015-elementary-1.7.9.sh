@@ -19,7 +19,7 @@ fi
 
 ## Run Autogen
 # echo -ne "Running autogen on ${ELEMENTARY}, please wait : "
-# NOCONFIGURE=1 ./autogen.sh >& ../build-logs/autogen_${ELEMENTARY}.log  || \
+# NOCONFIGURE=1 ./autogen.sh >../build-logs/autogen_${ELEMENTARY}.log  2>&1 || \
 #	(echo "Error!" && \
 #	(tail ../build-logs/autogen_${ELEMENTARY}.log || true) && \
 #	echo -ne "\n\nSee autogen_${ELEMENTARY}.log in the build-logs directory for details.\n" && \

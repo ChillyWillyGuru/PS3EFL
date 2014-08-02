@@ -17,7 +17,7 @@ cd ${ESKISS} && mkdir build-ppu
 
 ## Run Autogen
 echo -ne "Running autogen on ${ESKISS}, please wait : "
-NOCONFIGURE=1 ./autogen.sh >& ../build-logs/autogen_${ESKISS}.log  || \
+NOCONFIGURE=1 ./autogen.sh >../build-logs/autogen_${ESKISS}.log  2>&1 || \
 	(echo "Error!" && \
 	(tail ../build-logs/autogen_${ESKISS}.log || true) && \
 	echo -ne "\n\nSee autogen_${ESKISS}.log in the build-logs directory for details.\n" && \
