@@ -2,8 +2,8 @@
 # elementary.sh by Spork Schivago
 
 ELEMENTARY="elementary-1.7.9"
-EDJE_CC="`type -p edje_cc`"
-EET="`type -p eet`"
+EDJE_CC="`which edje_cc`"
+EET="`which eet`"
 
 ## Download the source
 wget --continue http://download.enlightenment.org/releases/${ELEMENTARY}.tar.bz2

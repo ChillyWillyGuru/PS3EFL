@@ -3,7 +3,7 @@
 
 ESKISS="eskiss"
 ESKISS_DATADIR="/dev_hdd0/game/ESKISS_00/USRDIR/"
-EDJE_CC="`type -p edje_cc`"
+EDJE_CC="`which edje_cc`"
 
 ## Download ESKISS via git.
 ## This is a bit unsafe because I cannot find the revision and 
