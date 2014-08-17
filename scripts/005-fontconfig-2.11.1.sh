@@ -1,7 +1,7 @@
 #!/bin/sh
-# fontconfig.sh by Spork Schivago
+# fontconfig-2.11.1.sh by Spork Schivago
 
-FONTCONFIG="fontconfig-2.11.0"
+FONTCONFIG="fontconfig-2.11.1"
 
 ## Download the source
 wget --continue http://freedesktop.org/software/fontconfig/release/${FONTCONFIG}.tar.bz2
