@@ -1,6 +1,40 @@
+diff -burN c-ares-1.10.0/acountry.c c-ares-1.10.0-PS3/acountry.c
+--- c-ares-1.10.0/acountry.c	2013-02-17 11:44:02.000000000 -0500
++++ c-ares-1.10.0-PS3/acountry.c	2014-08-26 22:31:59.432998340 -0400
+@@ -43,6 +43,7 @@
+ #else
+   #include <arpa/inet.h>
+   #include <netinet/in.h>
++  #include <net/select.h>
+   #include <netdb.h>
+ #endif
+ 
+diff -burN c-ares-1.10.0/adig.c c-ares-1.10.0-PS3/adig.c
+--- c-ares-1.10.0/adig.c	2013-02-17 11:44:02.000000000 -0500
++++ c-ares-1.10.0-PS3/adig.c	2014-08-26 22:31:39.879997645 -0400
+@@ -38,6 +38,8 @@
+ #  include <strings.h>
+ #endif
+ 
++#include <net/select.h>
++
+ #include "ares.h"
+ #include "ares_dns.h"
+ #include "ares_getopt.h"
+diff -burN c-ares-1.10.0/ahost.c c-ares-1.10.0-PS3/ahost.c
+--- c-ares-1.10.0/ahost.c	2013-02-17 11:44:02.000000000 -0500
++++ c-ares-1.10.0-PS3/ahost.c	2014-08-26 22:32:35.832999634 -0400
+@@ -19,6 +19,7 @@
+ #if !defined(WIN32) || defined(WATT32)
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
++#include <net/select.h>
+ #include <netdb.h>
+ #endif
+ 
 diff -burN c-ares-1.10.0/ares_writev.h c-ares-1.10.0-PS3/ares_writev.h
 --- c-ares-1.10.0/ares_writev.h	2011-04-29 18:15:58.000000000 -0400
-+++ c-ares-1.10.0-PS3/ares_writev.h	2013-12-19 02:22:33.721642329 -0500
++++ c-ares-1.10.0-PS3/ares_writev.h	2014-08-26 22:46:29.069029250 -0400
 @@ -22,12 +22,15 @@
  
  #ifndef HAVE_WRITEV
