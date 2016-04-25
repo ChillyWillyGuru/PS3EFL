@@ -22,6 +22,7 @@ cd build-ppu
 ## We must run cmake for Chipmunk before we configure
 cmake -DCMAKE_INSTALL_PREFIX=${PS3DEV}/portlibs/ppu/ \
 -DBUILD_SHARED=OFF -DBUILD_DEMOS=OFF \
+-DPS3DEV=${PS3DEV} -DPSL1GHT=${PSL1GHT} \
 -DCMAKE_AR=${PS3DEV}/ppu/bin/powerpc64-ps3-elf-ar \
 -DCMAKE_TOOLCHAIN_FILE=$(pwd)/../Toolchain-ps3.cmake ..
 
