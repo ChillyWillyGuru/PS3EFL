@@ -13,8 +13,8 @@ diff -burN Chipmunk-6.2.1/Toolchain-ps3.cmake Chipmunk-6.2.1-PS3/Toolchain-ps3.c
 +SET(PSL1GHT ${PSL1GHT}/)
 +
 +# specify the cross compiler
-+SET(CMAKE_C_COMPILER powerpc64-ps3-elf-gcc)
-+SET(CMAKE_CXX_COMPILER powerpc64-ps3-elf-g++)
++SET(CMAKE_C_COMPILER ${PS3DEV}/ppu/bin/powerpc64-ps3-elf-gcc)
++SET(CMAKE_CXX_COMPILER ${PS3DEV}/ppu/bin/powerpc64-ps3-elf-g++)
 +SET(CMAKE_C_FLAGS "-mcpu=cell -I${PSL1GHT}/ppu/include -I${PS3DEV}/portlibs/ppu/include")
 +SET(CMAKE_CXX_FLAGS "-mcpu=cell -I${PSL1GHT}/ppu/include -I${PS3DEV}/portlibs/ppu/include")
 +
